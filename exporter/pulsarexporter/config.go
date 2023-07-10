@@ -46,6 +46,10 @@ type Authentication struct {
 	Token  *Token  `mapstructure:"Token"`
 	Athenz *Athenz `mapstructure:"athenz"`
 	OAuth2 *OAuth2 `mapstructure:"oauth2"`
+	Basic  *Basic  `mapstructure:"basic"`
+}
+
+type Basic struct {
 }
 
 type TLS struct {

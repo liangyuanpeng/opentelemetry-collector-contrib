@@ -65,6 +65,45 @@ func TestLoadConfig(t *testing.T) {
 	}, c)
 }
 
+func TestLoadConfigForBasicAuth(t *testing.T) {
+	factories, err := componenttest.NopFactories()
+	assert.NoError(t, err)
+
+	factory := NewFactory()
+	factories.Exporters[typeStr] = factory
+
+	cfg, err := servicetest.LoadConfigAndValidate(filepath.Join("testdata", "config_auth_basic.yaml"), factories)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(cfg.Exporters))
+
+	c := cfg.Exporters[config.NewComponentID(typeStr)].(*Config)
+
+	assert.Equal(t, &Config{
+		ExporterSettings: config.NewExporterSettings(config.NewComponentID(typeStr)),
+		TimeoutSettings: exporterhelper.TimeoutSettings{
+			Timeout: 20 * time.Second,
+		},
+		RetrySettings: exporterhelper.RetrySettings{
+			Enabled:         true,
+			InitialInterval: 10 * time.Second,
+			MaxInterval:     1 * time.Minute,
+			MaxElapsedTime:  10 * time.Minute,
+		},
+		QueueSettings: exporterhelper.QueueSettings{
+			Enabled:      true,
+			NumConsumers: 2,
+			QueueSize:    10,
+		},
+		Endpoint:       "pulsar://localhost:6650",
+		Topic:          "spans",
+		Encoding:       "otlp-spans",
+		Authentication: Authentication{Basic: &Basic{Username: "hello", Password: "world"}},
+	}, c)
+
+	_, err = servicetest.LoadConfigAndValidate(filepath.Join("testdata", "config_auth_basic_nopassword.yaml"), factories)
+	require.Error(t, err, "password cannot be empty")
+}
+
 func TestClientOptions(t *testing.T) {
 	factories, err := componenttest.NopFactories()
 	assert.NoError(t, err)

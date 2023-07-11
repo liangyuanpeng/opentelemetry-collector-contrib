@@ -50,8 +50,8 @@ type Authentication struct {
 }
 
 type Basic struct {
-	username string `mapstructure:"username"`
-	password string `mapstructure:"password"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
 }
 
 type TLS struct {
@@ -84,7 +84,7 @@ var _ config.Exporter = (*Config)(nil)
 // Validate checks if the exporter configuration is valid
 func (cfg *Config) Validate() error {
 	if cfg.Authentication.Basic != nil {
-		if _, err := pulsar.NewAuthenticationBasic(cfg.Authentication.Basic.username, cfg.Authentication.Basic.password); err != nil {
+		if _, err := pulsar.NewAuthenticationBasic(cfg.Authentication.Basic.Username, cfg.Authentication.Basic.Password); err != nil {
 			return err
 		}
 	}
@@ -118,7 +118,7 @@ func (cfg *Config) auth() pulsar.Authentication {
 		})
 	}
 	if authentication.Basic != nil {
-		basicAuthProvider, _ := pulsar.NewAuthenticationBasic(authentication.Basic.username, authentication.Basic.password)
+		basicAuthProvider, _ := pulsar.NewAuthenticationBasic(authentication.Basic.Username, authentication.Basic.Password)
 		return basicAuthProvider
 	}
 
